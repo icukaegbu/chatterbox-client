@@ -1,5 +1,7 @@
 // YOUR CODE HERE:
 var app = {
+	//appUser: app.getUser(),
+
 	chatUsers: {},
 	//variables
 	//$body: $('.messages'),
@@ -14,6 +16,7 @@ var app = {
 
 	//methods
 	init: function(){
+		app.showUser();
 		app.fetch();
 		//app.refreshMessages();
 	},
@@ -47,6 +50,7 @@ var app = {
 				app.buildMessageDisplay(data.results);
 				app.addUsersToSidebar();   //add users to sidebar
 				app.stopSpinner();
+				app.getUser();
 
 				//console.log(data.results);
 			},
@@ -122,7 +126,7 @@ var app = {
 
 	postMessage: function(){
 	    var chat = $('#message').val();
-	    var message = app.buildMessage('bj', chat, 'new');
+	    var message = app.buildMessage(app.getUser(), chat, 'new');
 	    app.send(message);
 	    $('#message').val("");
 	    app.refreshMessages();
@@ -141,13 +145,14 @@ var app = {
 
 	addUsersToSidebar: function(){
 		//all users as a list
-		var $container = $('#chats');
+		var $container = $('.hashtags');
+		$container.html('');
 
 		for( var key in app.chatUsers ){
 			var str = key + ": ("+ app.chatUsers[key].length + ") chats"+ "<br/>";
-			var user = $('<span></span>').text(str);
+			var user = $('<span></span>').html(str);
 			user.appendTo($container);
-			console.log(key + ": ("+ app.chatUsers[key].length + ") chats");
+			//console.log(str);
 		}
 	},
 
@@ -165,6 +170,18 @@ var app = {
 		$('.spinner img').fadeOut('fast');
 		// $('form input[type=submit').attr('disabled', null);
 		$('#btnSendMessage').attr('disabled', null);
+	},
+
+	getUser: function(){
+		var queryString = window.location.search;
+		var user = queryString.substring( queryString.indexOf('?') + 10 );
+
+		return user;
+		//alert(queryString);
+	}, 
+
+	showUser: function(){
+		$('.username').html("User: "+ app.getUser());
 	}
 
 }
