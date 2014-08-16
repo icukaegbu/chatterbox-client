@@ -1,7 +1,6 @@
 // YOUR CODE HERE:
-
 var app = {
-
+	chatUsers: {},
 	//variables
 	//$body: $('.messages'),
 
@@ -46,14 +45,15 @@ var app = {
 				// }
 				//alert(data.toString());
 				app.buildMessageDisplay(data.results);
+				app.addUsersToSidebar();   //add users to sidebar
 				app.stopSpinner();
 
-				console.log(data.results);
+				//console.log(data.results);
 			},
 
 			error: function(data){
-				//console.log('chatterbox: Failed to send message')
-				alert("Help");
+				//console.log('chatterbox: Failed to retrieve messages')
+				alert("chatterbox: Failed to retrieve messages");
 			}
 		});
 	},
@@ -69,11 +69,13 @@ var app = {
 
 			//success function
 			success: function(data){
-				console.log('chatterbox: Message sent')
+				//console.log('chatterbox: Message sent');
+				alert("chatterbox: Message sent");
 			},
 
 			error: function(data){
-				console.log('chatterbox: Failed to send message')
+				console.log('chatterbox: Failed to send message');
+				alert("chatterbox: Failed to send message");
 			}
 		});
 		
@@ -106,12 +108,47 @@ var app = {
 
 			
 			str = un.text() + "<br/>" + text.text() + "<br/>" + room.text();
-		    console.log(str);
+		    //console.log(str);
 			$message = $('<div></div>').addClass('alert alert-info');
 			$message.html(str);
 			$message.appendTo($body);
+
+			//add to chatUsers
+			app.populateUsers(results[rLoop]);
 		}
 		//return $message.text(str);
+		//console.log("Chat Users: "+app.chatUsers);
+	},
+
+	postMessage: function(){
+	    var chat = $('#message').val();
+	    var message = app.buildMessage('bj', chat, 'new');
+	    app.send(message);
+	    $('#message').val("");
+	    app.refreshMessages();
+	},
+
+	populateUsers: function(chat){
+		//if user exists in the object, add his chat to the arra, else create a new user with a new array
+		if ( app.chatUsers.hasOwnProperty(chat.username) ){
+			app.chatUsers[chat.username].push(chat.text);
+		}
+		else{
+			app.chatUsers[chat.username]= [];
+			app.chatUsers[chat.username].push(chat.text);
+		}
+	},
+
+	addUsersToSidebar: function(){
+		//all users as a list
+		var $container = $('#chats');
+
+		for( var key in app.chatUsers ){
+			var str = key + ": ("+ app.chatUsers[key].length + ") chats"+ "<br/>";
+			var user = $('<span></span>').text(str);
+			user.appendTo($container);
+			console.log(key + ": ("+ app.chatUsers[key].length + ") chats");
+		}
 	},
 
 	refreshMessages: function (){
